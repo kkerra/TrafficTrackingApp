@@ -59,17 +59,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MaterialTheme {
-                var showAddEventScreen by remember { mutableStateOf(false) } // Состояние для экрана добавления события
+                var showAddEventScreen by remember { mutableStateOf(false) }
 
                 if (showAddEventScreen) {
                     AddEventScreen(onEventAdded = {
-                        showAddEventScreen = false // Закрыть экран добавления события после добавления
+                        showAddEventScreen = false
                     }, onClose = {
-                        showAddEventScreen = false // Закрыть экран при нажатии кнопки закрытия
+                        showAddEventScreen = false
                     })
                 } else {
                     IntersectionListScreen(onAddEventClick = {
-                        showAddEventScreen = true // Открыть экран добавления события
+                        showAddEventScreen = true
                     })
                 }
             }
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val cardBackgroundColor = Color(0xFFE0E0E0) // Светло-серый
+val cardBackgroundColor = Color(0xFFE0E0E0)
 val cardContentColor = Color.Black
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -163,8 +163,8 @@ fun IntersectionItem(intersection: Intersection, onIntersectionClick: () -> Unit
             .clickable { onIntersectionClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = cardBackgroundColor, // Устанавливаем цвет фона
-            contentColor = cardContentColor      // Устанавливаем цвет контента
+            containerColor = cardBackgroundColor,
+            contentColor = cardContentColor
         )
     ) {
         Column(
@@ -209,9 +209,9 @@ fun IntersectionDetails(trafficLights: List<TrafficLight>, events: List<Event>, 
 }
 
 @Composable
-fun TrafficLightList(trafficLights: List<TrafficLight>?) { // Allow null
+fun TrafficLightList(trafficLights: List<TrafficLight>?) {
     Column(modifier = Modifier.padding(8.dp)) {
-        if (trafficLights == null || trafficLights.isEmpty()) { // Check for null
+        if (trafficLights == null || trafficLights.isEmpty()) {
             Text("No traffic lights found for this intersection.")
         } else {
             trafficLights.forEach { trafficLight ->
@@ -240,7 +240,7 @@ fun TrafficLightItem(trafficLight: TrafficLight) {
 }
 
 @Composable
-fun EventList(events: List<Event>?) { // Allow null
+fun EventList(events: List<Event>?) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     Column(modifier = Modifier.padding(8.dp)) {
@@ -256,14 +256,14 @@ fun EventList(events: List<Event>?) { // Allow null
 
 @Composable
 fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
-    val trafficImpactRed = Color(0xFFF44336)   // Красный
-    val trafficImpactYellow = Color(0xFFFFEB3B) // Желтый
-    val trafficImpactGreen = Color(0xFF4CAF50)  // Зеленый
+    val trafficImpactRed = Color(0xFFF44336)
+    val trafficImpactYellow = Color(0xFFFFEB3B)
+    val trafficImpactGreen = Color(0xFF4CAF50)
     val trafficImpactColor = when (event.trafficImpactLevel) {
         5 -> trafficImpactRed
         in 3..4 -> trafficImpactYellow
         in 1..2 -> trafficImpactGreen
-        else -> Color.Gray // Или другой цвет по умолчанию, если trafficImpactLevel не входит ни в один диапазон
+        else -> Color.Gray
     }
 
     Card(
@@ -315,11 +315,11 @@ fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
 @Composable
 fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current // Для отображения Toast
-    val viewModel: IntersectionViewModel = viewModel() // Получите экземпляр ViewModel
+    val context = LocalContext.current
+    val viewModel: IntersectionViewModel = viewModel()
 
     var type by remember { mutableStateOf(TextFieldValue("")) }
-    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) } //  "yyyy-MM-ddTHH:mm:ss"
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) }
     var startTime by remember { mutableStateOf(TextFieldValue("")) }
     var endTime by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
@@ -381,17 +381,17 @@ fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
                 coroutineScope.launch {
                     try {
                         val newEvent = Event(
-                            eventId = 0, // API сгенерирует ID
+                            eventId = 0,
                             type = type.text,
-                            startTime = startTime.text,  // Отправляем как String
-                            endTime = endTime.text,      // Отправляем как String
+                            startTime = startTime.text,
+                            endTime = endTime.text,
                             description = description.text,
-                            trafficImpactLevel = trafficImpactLevel.text.toIntOrNull() ?: 1 // Значение по умолчанию, если не удалось преобразовать
+                            trafficImpactLevel = trafficImpactLevel.text.toIntOrNull() ?: 1
                         )
 
                         viewModel.postEvent(newEvent)
 
-                        onEventAdded() // Вернуться к списку перекрестков
+                        onEventAdded()
 
                         Toast.makeText(context, "Event added successfully", Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {

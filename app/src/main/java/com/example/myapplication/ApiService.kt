@@ -14,7 +14,7 @@ interface ApiService {
     @GET("api/TrafficLights/intersection/{intersectionId}")
     fun getTrafficLightsByIntersectionId(@Path("intersectionId") intersectionId: Int): Call<List<TrafficLight>>
 
-    @GET("api/Events/intersection/{intersectionId}") // Replace with your API endpoint
+    @GET("api/Events/intersection/{intersectionId}")
     fun getEventsByIntersectionId(@Path("intersectionId") intersectionId: Int): Call<List<Event>>
 
     @POST("api/Events")

@@ -17,11 +17,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 private val retrofit = Retrofit.Builder()
-    .baseUrl("http://10.0.2.2:5291/") // Замените на свой URL
+    .baseUrl("http://10.0.2.2:5291/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-// Создайте экземпляр ApiService
 private val apiService = retrofit.create(ApiService::class.java)
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -159,8 +158,7 @@ class IntersectionViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val createdEvent = apiService.postEvent(newEvent)
-                // Refresh the list of events after successful posting
-                loadEventsForIntersection(selectedIntersection?.intersectionId ?: 0) // Используйте ID текущего перекрестка
+                loadEventsForIntersection(selectedIntersection?.intersectionId ?: 0)
 
             } catch (e: Exception) {
                 errorMessage = "Failed to post event: ${e.message}"
