@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val cardBackgroundColor = Color(0xFFE0E0E0)
+val cardBackgroundColor = Color.White
 val cardContentColor = Color.Black
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -96,10 +96,10 @@ fun IntersectionListScreen(onAddEventClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Intersections") },
+                title = { Text("Перекрестки") },
                 actions = {
                     IconButton(onClick = onAddEventClick) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add Event")
+                        Icon(Icons.Filled.Add, contentDescription = "Добавить событие")
                     }
                 }
             )
@@ -118,7 +118,7 @@ fun IntersectionListScreen(onAddEventClick: () -> Unit) {
                     CircularProgressIndicator()
                 }
             } else if (errorMessage.isNotEmpty()) {
-                Text(text = "Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+                Text(text = "Ошибка: $errorMessage", color = MaterialTheme.colorScheme.error)
             } else {
                 if (intersections.isNotEmpty()) {
                     LazyColumn(
@@ -146,7 +146,7 @@ fun IntersectionListScreen(onAddEventClick: () -> Unit) {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No intersections found.")
+                        Text("Перекрестков не найдено.")
                     }
                 }
             }
@@ -170,12 +170,12 @@ fun IntersectionItem(intersection: Intersection, onIntersectionClick: () -> Unit
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "ID: ${intersection.intersectionId}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Latitude: ${intersection.latitude}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Longitude: ${intersection.longitude}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Lanes: ${intersection.lanesAmount}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Turning Lanes: ${if (intersection.isTurningLanes) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Update Date: ${intersection.updateDate ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Номер перекрестка: ${intersection.intersectionId}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Широта: ${intersection.latitude}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Долгота: ${intersection.longitude}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Количество полос: ${intersection.lanesAmount}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Наличие поворотных полос: ${if (intersection.isTurningLanes) "Да" else "Нет"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Дата последнего обновления: ${intersection.updateDate ?: "Не определено"}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -195,14 +195,14 @@ fun IntersectionDetails(trafficLights: List<TrafficLight>, events: List<Event>, 
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "Traffic Lights", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Светофоры:", style = MaterialTheme.typography.titleMedium)
             TrafficLightList(trafficLights = trafficLights)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Events", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Событие", style = MaterialTheme.typography.titleMedium)
             EventList(events = events)
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onClose) {
-                Text("Close")
+                Text("Закрыть")
             }
         }
     }
@@ -210,9 +210,10 @@ fun IntersectionDetails(trafficLights: List<TrafficLight>, events: List<Event>, 
 
 @Composable
 fun TrafficLightList(trafficLights: List<TrafficLight>?) {
-    Column(modifier = Modifier.padding(8.dp)) {
+    Column(modifier = Modifier.padding(8.dp)
+        .background(Color.White)) {
         if (trafficLights == null || trafficLights.isEmpty()) {
-            Text("No traffic lights found for this intersection.")
+            Text("Не найдено светофоров для перекрестков")
         } else {
             trafficLights.forEach { trafficLight ->
                 TrafficLightItem(trafficLight = trafficLight)
@@ -227,14 +228,17 @@ fun TrafficLightItem(trafficLight: TrafficLight) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            Text(text = "ID: ${trafficLight.trafficLightId}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Type: ${trafficLight.type}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "State: ${trafficLight.state}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Номер светофора: ${trafficLight.trafficLightId}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Тип: ${trafficLight.type}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Статус: ${trafficLight.state}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -244,8 +248,8 @@ fun EventList(events: List<Event>?) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     Column(modifier = Modifier.padding(8.dp)) {
-        if (events == null || events.isEmpty()) { // Check for null
-            Text("No events found for this intersection.")
+        if (events == null || events.isEmpty()) {
+            Text("Событий для перекрестка не найдено.")
         } else {
             events.forEach { event ->
                 EventItem(event = event, dateFormat = dateFormat)
@@ -265,6 +269,7 @@ fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
         in 1..2 -> trafficImpactGreen
         else -> Color.Gray
     }
+    val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) }
 
     Card(
         modifier = Modifier
@@ -288,21 +293,21 @@ fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(text = "Type: ${event.type}", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Тип: ${event.type}", style = MaterialTheme.typography.bodySmall)
                 Text(
-                    text = "Start Time: ${formatDateString(event.startTime, dateFormat) ?: "N/A"}",
+                    text = "Начало: ${formatDateString(event.startTime, dateFormat) ?: "Не определено"}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "End Time: ${formatDateString(event.endTime, dateFormat) ?: "N/A"}",
+                    text = "Конец: ${formatDateString(event.endTime, dateFormat) ?: "Не определено"}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Description: ${event.description ?: "N/A"}",
+                    text = "Описание: ${event.description ?: "Не определено"}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Traffic Impact: ${event.trafficImpactLevel}",
+                    text = "Влияние на трафик (1-5): ${event.trafficImpactLevel}",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -324,14 +329,15 @@ fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
     var endTime by remember { mutableStateOf(TextFieldValue("")) }
     var description by remember { mutableStateOf(TextFieldValue("")) }
     var trafficImpactLevel by remember { mutableStateOf(TextFieldValue("")) }
+    var intersectionId by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Event") },
+                title = { Text("Добавить событие") },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Назад")
                     }
                 }
             )
@@ -341,37 +347,44 @@ fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
                 value = type,
                 onValueChange = { type = it },
-                label = { Text("Type") },
+                label = { Text("Тип") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = startTime,
                 onValueChange = { startTime = it },
-                label = { Text("Start Time (yyyy-MM-dd HH:mm)") },
+                label = { Text("Начало (yyyy-MM-dd HH:mm)") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = endTime,
                 onValueChange = { endTime = it },
-                label = { Text("End Time (yyyy-MM-dd HH:mm)") },
+                label = { Text("Конец (yyyy-MM-dd HH:mm)") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
+                label = { Text("Описание") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
                 value = trafficImpactLevel,
                 onValueChange = { trafficImpactLevel = it },
-                label = { Text("Traffic Impact Level (1-5)") },
+                label = { Text("Влияние на трафик (1-5)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = intersectionId,
+                onValueChange = { intersectionId = it },
+                label = { Text("Номер перекрестка") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -389,18 +402,30 @@ fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
                             trafficImpactLevel = trafficImpactLevel.text.toIntOrNull() ?: 1
                         )
 
-                        viewModel.postEvent(newEvent)
+                        viewModel.postEvent(
+                            newEvent = newEvent,
+                            intersectionId = intersectionId.text.toIntOrNull() ?: 0
+                        )
 
                         onEventAdded()
+                        Toast.makeText(context, "Событие успешно добавлено", Toast.LENGTH_SHORT).show()
 
-                        Toast.makeText(context, "Event added successfully", Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Error adding event: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Ошибка при добавлении: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }) {
-                Text("Add Event")
+                Text("Добавление")
             }
+        }
+    }
+}
+
+@Composable
+fun <T> DataList(items: List<T>, itemContent: @Composable (item: T) -> Unit) {
+    Column {
+        items.forEach { item ->
+            itemContent(item)
         }
     }
 }

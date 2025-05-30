@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("api/Intersections")
@@ -18,5 +19,8 @@ interface ApiService {
     fun getEventsByIntersectionId(@Path("intersectionId") intersectionId: Int): Call<List<Event>>
 
     @POST("api/Events")
-    suspend fun postEvent(@Body newEvent: Event): Event
+    suspend fun postEvent(
+        @Query("intersectionId") intersectionId: Int,
+        @Body newEvent: Event
+    ): Event
 }

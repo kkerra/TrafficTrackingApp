@@ -154,11 +154,11 @@ class IntersectionViewModel : ViewModel() {
         showEvents = false
     }
 
-    fun postEvent(newEvent: Event) {
+    fun postEvent(newEvent: Event, intersectionId: Int) {
         viewModelScope.launch {
             try {
-                val createdEvent = apiService.postEvent(newEvent)
-                loadEventsForIntersection(selectedIntersection?.intersectionId ?: 0)
+                val createdEvent = apiService.postEvent(intersectionId, newEvent)
+                loadEventsForIntersection(selectedIntersection?.intersectionId ?: intersectionId) // Используйте ID текущего перекрестка
 
             } catch (e: Exception) {
                 errorMessage = "Failed to post event: ${e.message}"
