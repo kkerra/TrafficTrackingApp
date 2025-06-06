@@ -16,40 +16,29 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.graphics.Color
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.BottomSheetState
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberModalBottomSheetState
 import kotlinx.coroutines.launch
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Dp
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -224,67 +213,49 @@ fun TrafficLightList(trafficLights: List<TrafficLight>?) {
 
 @Composable
 fun TrafficLightItem(trafficLight: TrafficLight) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+    CommonCardItem(
+        backgroundColor = Color.White,
+        contentColor = MaterialTheme.colorScheme.onBackground
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text(text = "Номер светофора: ${trafficLight.trafficLightId}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Тип: ${trafficLight.type}", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Статус: ${trafficLight.state}", style = MaterialTheme.typography.bodySmall)
-        }
+        Text(text = "Номер светофора: ${trafficLight.trafficLightId}",
+            style = MaterialTheme.typography.bodySmall)
+        Text(text = "Тип: ${trafficLight.type}",
+            style = MaterialTheme.typography.bodySmall)
+        Text(text = "Статус: ${trafficLight.state}",
+            style = MaterialTheme.typography.bodySmall)
     }
 }
 
 @Composable
 fun EventList(events: List<Event>?) {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     Column(modifier = Modifier.padding(8.dp)) {
         if (events == null || events.isEmpty()) {
             Text("Событий для перекрестка не найдено.")
         } else {
             events.forEach { event ->
-                EventItem(event = event, dateFormat = dateFormat)
+                EventItem(event = event)
             }
         }
     }
 }
 
 @Composable
-fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
-    val trafficImpactRed = Color(0xFFF44336)
-    val trafficImpactYellow = Color(0xFFFFEB3B)
-    val trafficImpactGreen = Color(0xFF4CAF50)
+fun EventItem(event: Event) {
     val trafficImpactColor = when (event.trafficImpactLevel) {
-        5 -> trafficImpactRed
-        in 3..4 -> trafficImpactYellow
-        in 1..2 -> trafficImpactGreen
+        5 -> Color(0xFFF44336)
+        in 3..4 -> Color(0xFFFFEB3B)
+        in 1..2 -> Color(0xFF4CAF50)
         else -> Color.Gray
     }
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = cardBackgroundColor,
-            contentColor = cardContentColor
-        )
+    CommonCardItem(
+        backgroundColor = cardBackgroundColor,
+        contentColor = cardContentColor
     ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
                     .size(16.dp)
@@ -293,7 +264,8 @@ fun EventItem(event: Event, dateFormat: SimpleDateFormat) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(text = "Тип: ${event.type}", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Тип: ${event.type}",
+                    style = MaterialTheme.typography.bodySmall)
                 Text(
                     text = "Начало: ${formatDateString(event.startTime, dateFormat) ?: "Не определено"}",
                     style = MaterialTheme.typography.bodySmall
@@ -422,11 +394,30 @@ fun AddEventScreen(onEventAdded: () -> Unit, onClose: () -> Unit) {
 }
 
 @Composable
-fun <T> DataList(items: List<T>, itemContent: @Composable (item: T) -> Unit) {
-    Column {
-        items.forEach { item ->
-            itemContent(item)
-        }
+fun CommonCardItem(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.White,
+    contentColor: Color = MaterialTheme.colorScheme.onBackground,
+    elevation: Dp = 2.dp,
+    verticalPadding: Dp = 4.dp,
+    horizontalPadding: Dp = 0.dp,
+    contentPadding: Dp = 8.dp,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = verticalPadding, horizontal = horizontalPadding),
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor,
+            contentColor = contentColor
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(contentPadding),
+            content = content
+        )
     }
 }
 
